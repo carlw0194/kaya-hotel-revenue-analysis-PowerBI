@@ -1,0 +1,181 @@
+-- =====================================================================================
+--  CONSOLIDATED DAX MEASURES &amp; COLUMNS FOR KAYA HOTEL GROUP ANALYSIS
+-- =====================================================================================
+
+\-- =====================================================================================
+\--  TIER 1: EXECUTIVE KPIs
+\--  These measures should be in a table/folder named '\_Tier 1 KPIs'
+\-- =====================================================================================
+
+\-- Calculates the total income from completed guest stays.
+Total Realized Revenue =
+CALCULATE (
+SUM ( 'fact\_bookings'[revenue\_realized] ),
+'fact\_bookings'[booking\_status] = "Checked Out"
+)
+
+\-- Calculates the overall percentage of available rooms that were sold.
+Occupancy Rate =
+DIVIDE (
+SUM ( 'fact\_aggregated\_bookings'[successful\_bookings] ),
+SUM ( 'fact\_aggregated\_bookings'[capacity] ),
+0
+)
+
+\-- Calculates the average rental income per paid occupied room.
+Average Daily Rate =
+DIVIDE (
+[Total Realized Revenue],
+SUM ( 'fact\_aggregated\_bookings'[successful\_bookings] ),
+0
+)
+
+\-- Calculates the total revenue earned per available room.
+RevPAR = [Average Daily Rate] \* [Occupancy Rate]
+
+\-- =====================================================================================
+\--  TIER 2: DIAGNOSTIC METRICS
+\--  These measures should be in a table/folder named '\_Tier 2 Diagnostics'
+\-- =====================================================================================
+
+\-- Calculates the percentage of total bookings that were canceled.
+Cancellation Rate =
+VAR TotalCancellations =
+CALCULATE (
+COUNTROWS ( 'fact\_bookings' ),
+'fact\_bookings'[booking\_status] = "Cancelled"
+)
+VAR TotalBookings =
+COUNTROWS ( 'fact\_bookings' )
+RETURN
+DIVIDE ( TotalCancellations, TotalBookings, 0 )
+
+\-- Calculates the percentage of total bookings that were a no-show.
+No-Show Rate =
+VAR NoShowCount =
+CALCULATE (
+COUNTROWS ( 'fact\_bookings' ),
+'fact\_bookings'[booking\_status] = "No Show"
+)
+VAR TotalBookings =
+COUNTROWS ( 'fact\_bookings' )
+RETURN
+DIVIDE ( NoShowCount, TotalBookings, 0 )
+
+\-- Calculates the average number of nights for completed stays.
+Average Length of Stay =
+AVERAGEX (
+FILTER ( 'fact\_bookings', 'fact\_bookings'[booking\_status] = "Checked Out" ),
+DATEDIFF (
+'fact\_bookings'[check\_in\_date],
+'fact\_bookings'[checkout\_date],
+DAY
+)
+)
+
+\-- Calculates the overall average time between booking and check-in.
+Booking Lead Time =
+AVERAGEX (
+'fact\_bookings',
+DATEDIFF (
+'fact\_bookings'[booking\_date],
+'fact\_bookings'[check\_in\_date],
+DAY
+)
+)
+
+\-- =====================================================================================
+\--  TIME INTELLIGENCE MEASURES
+\--  These measures should be in a table/folder named '\_Time Intelligence'
+\-- =====================================================================================
+
+\-- Calculates cumulative revenue from the start of the year.
+Revenue YTD =
+TOTALYTD ( [Total Realized Revenue], 'dim\_date'[date] )
+
+\-- Calculates the rolling 3-month average for RevPAR to smooth out trends.
+RevPAR 3-Month Rolling Avg =
+CALCULATE (
+[RevPAR],
+DATESINPERIOD (
+'dim\_date'[date],
+LASTDATE ( 'dim\_date'[date] ),
+\-3,
+MONTH
+)
+)
+
+\-- Calculates the revenue from the previous month for MoM comparison.
+Previous Month Revenue =
+CALCULATE (
+[Total Realized Revenue],
+DATEADD ( 'dim\_date'[date], -1, MONTH )
+)
+
+\-- Calculates the percentage change in revenue from the previous month.
+Revenue MoM % =
+DIVIDE (
+[Total Realized Revenue] - [Previous Month Revenue],
+[Previous Month Revenue],
+0
+)
+
+\-- Calculates the occupancy rate from the previous month.
+Previous Month Occupancy =
+CALCULATE (
+[Occupancy Rate],
+DATEADD ( 'dim\_date'[date], -1, MONTH )
+)
+
+\-- Calculates the absolute change in occupancy percentage points.
+Occupancy MoM Change = [Occupancy Rate] - [Previous Month Occupancy]
+
+\-- Calculates the ADR from the previous month.
+Previous Month ADR =
+CALCULATE (
+[Average Daily Rate],
+DATEADD ( 'dim\_date'[date], -1, MONTH )
+)
+
+\-- Calculates the percentage change in ADR from the previous month.
+ADR MoM % =
+DIVIDE (
+[Average Daily Rate] - [Previous Month ADR],
+[Previous Month ADR],
+0
+)
+
+\-- =====================================================================================
+\--  CALCULATED COLUMNS
+\--  These columns should be created in the 'fact\_bookings' table.
+\-- =====================================================================================
+
+\-- Calculates the lead time in days for each individual booking row.
+Lead Time (Days) =
+DATEDIFF (
+'fact\_bookings'[booking\_date],
+'fact\_bookings'[check\_in\_date],
+DAY
+)
+
+\-- Groups the lead times into user-friendly bins for analysis.
+Booking Window Group =
+SWITCH (
+TRUE (),
+'fact\_bookings'[Lead Time (Days)] \<= 7, "0-7 Days",
+'fact\_bookings'[Lead Time (Days)] \<= 30, "8-30 Days",
+'fact\_bookings'[Lead Time (Days)] \<= 60, "31-60 Days",
+'fact\_bookings'[Lead Time (Days)] \<= 90, "61-90 Days",
+"91+ Days"
+)
+
+\-- Provides a numeric sort order for the Booking Window Group.
+Booking Window Sort Order =
+SWITCH (
+TRUE (),
+'fact\_bookings'[Lead Time (Days)] \<= 7, 1,
+'fact\_bookings'[Lead Time (Days)] \<= 30, 2,
+'fact\_bookings'[Lead Time (Days)] \<= 60, 3,
+'fact\_bookings'[Lead Time (Days)] \<= 90, 4,
+5
+)
