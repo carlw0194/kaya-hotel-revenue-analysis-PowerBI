@@ -1,8 +1,23 @@
 # Kaya Hotel Revenue Analysis (Power BI)
 
-![Dashboard Hero](kaya%20hotel%20report.PNG)
+A comprehensive **Power BI** project that analyzes the revenue performance of Kaya Hotel. The report provides actionable insights across three key dashboards: Executive Overview, Diagnostics, and Operations, helping management make data-driven decisions.
 
-A comprehensive **Power BI** project that analyses the revenue performance of Kaya Hotel.  The report highlights key metrics such as room revenue, ADR, RevPAR, occupancy, seasonality trends, and booking lead-times, helping management make data-driven decisions.
+## 📊 Dashboard Overview
+
+### 1. Executive Dashboard
+![Executive Dashboard](kaya_exec_page.PNG)
+
+The Executive Dashboard provides a high-level overview of key performance indicators including total revenue, occupancy rates, ADR, and RevPAR. It's designed for quick decision-making with month-over-month comparisons and trend analysis.
+
+### 2. Diagnostics Dashboard
+![Diagnostics Dashboard](kaya_diagnostics_page.PNG)
+
+The Diagnostics Dashboard dives deeper into performance metrics, highlighting booking patterns, cancellation rates, and market segment performance to identify areas for improvement.
+
+### 3. Operations Dashboard
+![Operations Dashboard](kaya_operations_page.PNG)
+
+The Operations Dashboard focuses on day-to-day metrics, room inventory management, and staff performance indicators to ensure smooth hotel operations.
 
 ---
 
@@ -10,28 +25,30 @@ A comprehensive **Power BI** project that analyses the revenue performance of Ka
 
 | Path | Description |
 |------|-------------|
-| `kaya_hotel_Page1.pbix` | Main Power BI file containing all visuals & measures |
-| `kaya hotel report.PNG` | High-resolution screenshot of the final dashboard |
-| `kaya_model.PNG` | Screenshot of the data-model schema |
+| `kaya_hotel_Page1.pbix` | Main Power BI file containing all dashboards & measures |
+| `kaya_exec_page.PNG` | Executive dashboard overview |
+| `kaya_diagnostics_page.PNG` | Diagnostics dashboard |
+| `kaya_operations_page.PNG` | Operations dashboard |
+| `kaya_model.PNG` | Data model schema |
 | `kaya hotel revenue analysis data.rar` | Compressed raw dataset (CSV / Excel inside) |
-
 
 ## ✨ Key Insights & KPIs
 
-| KPI | Measure |
-|-----|---------|
+| KPI | Description |
+|-----|-------------|
 | **Total Revenue** | Overall hotel revenue during selected period |
 | **Average Daily Rate (ADR)** | Avg price paid per occupied room |
 | **RevPAR** | Revenue per available room |
 | **Occupancy %** | Rooms sold vs rooms available |
-| **YoY / MoM Growth** | Compares performance across time |
+| **Cancellation Rate** | Percentage of canceled bookings |
+| **Booking Lead Time** | Average days between booking and check-in |
 
-Additional visuals include:
+Additional insights include:
 
-* Booking lead-time distribution  
-* Segmentation by market (Corporate, OTA, Direct, etc.)  
-* Seasonality & trend decomposition  
-* Top performing room types & channels
+* Market segment performance (Corporate, OTA, Direct, etc.)  
+* Room type performance and availability  
+* Seasonal trends and booking patterns  
+* Revenue forecasting and goal tracking
 
 ![Data Model](kaya_model.PNG)
 
